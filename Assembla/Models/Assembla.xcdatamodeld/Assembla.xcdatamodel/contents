@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="17709" systemVersion="20F71" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
+    <entity name="Mention" representedClassName=".Mention" syncable="YES">
+        <attribute name="authorId" optional="YES" attributeType="String"/>
+        <attribute name="createdAt" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="id" optional="YES" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="link" optional="YES" attributeType="String"/>
+        <attribute name="message" optional="YES" attributeType="String"/>
+        <attribute name="read" optional="YES" attributeType="Boolean" usesScalarValueType="YES"/>
+    </entity>
+    <entity name="MergeRequest" representedClassName=".MergeRequest" syncable="YES">
+        <attribute name="id" optional="YES" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="status" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="title" optional="YES" attributeType="String"/>
+        <attribute name="updatedAt" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <relationship name="comments" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="MergeRequestComment" inverseName="mergeRequest" inverseEntity="MergeRequestComment"/>
+    </entity>
+    <entity name="MergeRequestComment" representedClassName=".MergeRequestComment" syncable="YES">
+        <attribute name="content" optional="YES" attributeType="String"/>
+        <attribute name="createdAt" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="id" optional="YES" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="mergeRequestId" optional="YES" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="spaceId" optional="YES" attributeType="String"/>
+        <attribute name="updatedAt" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="userId" optional="YES" attributeType="String"/>
+        <relationship name="mergeRequest" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="MergeRequest" inverseName="comments" inverseEntity="MergeRequest"/>
+        <relationship name="space" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Space" inverseName="mergeRequestComments" inverseEntity="Space"/>
+    </entity>
+    <entity name="Milestone" representedClassName=".Milestone" syncable="YES">
+        <attribute name="id" optional="YES" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="title" optional="YES" attributeType="String"/>
+        <relationship name="tickets" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Ticket" inverseName="milestone" inverseEntity="Ticket"/>
+    </entity>
+    <entity name="Priority" representedClassName=".Priority" syncable="YES">
+        <attribute name="row" optional="YES" attributeType="Integer 16" defaultValueString="32760" usesScalarValueType="YES"/>
+        <relationship name="section" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="PrioritySection" inverseName="priority" inverseEntity="PrioritySection"/>
+        <relationship name="ticket" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Ticket" inverseName="myPriority" inverseEntity="Ticket"/>
+    </entity>
+    <entity name="PrioritySection" representedClassName=".PrioritySection" syncable="YES">
+        <attribute name="id" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="name" optional="YES" attributeType="String"/>
+        <relationship name="priority" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Priority" inverseName="section" inverseEntity="Priority"/>
+    </entity>
+    <entity name="Space" representedClassName=".Space" syncable="YES">
+        <attribute name="approved" optional="YES" attributeType="Boolean" usesScalarValueType="YES"/>
+        <attribute name="banner" optional="YES" attributeType="String"/>
+        <attribute name="bannerHeight" optional="YES" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="bannerLink" optional="YES" attributeType="String"/>
+        <attribute name="bannerText" optional="YES" attributeType="String"/>
+        <attribute name="canApply" optional="YES" attributeType="Boolean" usesScalarValueType="YES"/>
+        <attribute name="canJoin" optional="YES" attributeType="Boolean" usesScalarValueType="YES"/>
+        <attribute name="commercialFrom" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="createdAt" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="defaultShowPage" optional="YES" attributeType="String"/>
+        <attribute name="details" optional="YES" attributeType="String"/>
+        <attribute name="id" optional="YES" attributeType="String"/>
+        <attribute name="isCommercial" optional="YES" attributeType="Boolean" usesScalarValueType="YES"/>
+        <attribute name="isManager" optional="YES" attributeType="Boolean" usesScalarValueType="YES"/>
+        <attribute name="isVolunteer" optional="YES" attributeType="Boolean" usesScalarValueType="YES"/>
+        <attribute name="lastPayerChangedAt" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="name" optional="YES" attributeType="String"/>
+        <attribute name="parentId" optional="YES" attributeType="String"/>
+        <attribute name="publicPermissions" optional="YES" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="restricted" optional="YES" attributeType="Boolean" usesScalarValueType="YES"/>
+        <attribute name="restrictedDate" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="sharePermissions" optional="YES" attributeType="Boolean" usesScalarValueType="YES"/>
+        <attribute name="status" optional="YES" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="style" optional="YES" attributeType="String"/>
+        <attribute name="tabsOrder" optional="YES" attributeType="String"/>
+        <attribute name="teamPermissions" optional="YES" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="teamTabRole" optional="YES" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="updatedAt" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="watcherPermissions" optional="YES" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="wikiName" optional="YES" attributeType="String"/>
+        <relationship name="mergeRequestComments" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="MergeRequestComment" inverseName="space" inverseEntity="MergeRequestComment"/>
+        <relationship name="spaceTool" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="SpaceTool" inverseName="space" inverseEntity="SpaceTool"/>
+        <relationship name="tickets" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="Ticket" inverseName="space" inverseEntity="Ticket"/>
+    </entity>
+    <entity name="SpaceTool" representedClassName=".SpaceTool" syncable="YES">
+        <attribute name="active" optional="YES" attributeType="Boolean" usesScalarValueType="YES"/>
+        <attribute name="id" optional="YES" attributeType="String"/>
+        <attribute name="name" optional="YES" attributeType="String"/>
+        <attribute name="spaceId" optional="YES" attributeType="String"/>
+        <attribute name="toolId" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
+        <relationship name="space" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Space" inverseName="spaceTool" inverseEntity="Space"/>
+    </entity>
+    <entity name="Ticket" representedClassName=".Ticket" syncable="YES">
+        <attribute name="assignedToId" optional="YES" attributeType="String"/>
+        <attribute name="completedDate" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="componentId" optional="YES" attributeType="String"/>
+        <attribute name="createdOn" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="details" optional="YES" attributeType="String"/>
+        <attribute name="estimate" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
+        <attribute name="id" optional="YES" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="importance" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
+        <attribute name="isStory" optional="YES" attributeType="Boolean" usesScalarValueType="YES"/>
+        <attribute name="milestoneId" optional="YES" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="notificationList" optional="YES" attributeType="String"/>
+        <attribute name="number" optional="YES" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="numberWithPrefix" optional="YES" attributeType="String"/>
+        <attribute name="permissionType" optional="YES" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="priority" optional="YES" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="spaceId" optional="YES" attributeType="String"/>
+        <attribute name="status" optional="YES" attributeType="String"/>
+        <attribute name="statusName" optional="YES" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="storyImportance" optional="YES" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="summary" optional="YES" attributeType="String"/>
+        <attribute name="totalEstimate" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
+        <attribute name="totalInvestedHours" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
+        <attribute name="totalWorkingHours" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
+        <attribute name="updatedAt" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="workingHours" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
+        <relationship name="milestone" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Milestone" inverseName="tickets" inverseEntity="Milestone"/>
+        <relationship name="myPriority" optional="YES" maxCount="1" deletionRule="Cascade" destinationEntity="Priority" inverseName="ticket" inverseEntity="Priority"/>
+        <relationship name="space" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Space" inverseName="tickets" inverseEntity="Space"/>
+    </entity>
+    <elements>
+        <element name="Mention" positionX="-54" positionY="135" width="128" height="119"/>
+        <element name="MergeRequest" positionX="-45" positionY="135" width="128" height="118"/>
+        <element name="MergeRequestComment" positionX="-36" positionY="144" width="128" height="178"/>
+        <element name="Milestone" positionX="-54" positionY="126" width="128" height="88"/>
+        <element name="Priority" positionX="-54" positionY="135" width="128" height="74"/>
+        <element name="PrioritySection" positionX="-45" positionY="144" width="128" height="74"/>
+        <element name="Space" positionX="-63" positionY="-18" width="128" height="538"/>
+        <element name="SpaceTool" positionX="-54" positionY="126" width="128" height="133"/>
+        <element name="Ticket" positionX="-63" positionY="-27" width="128" height="449"/>
+    </elements>
+</model>
