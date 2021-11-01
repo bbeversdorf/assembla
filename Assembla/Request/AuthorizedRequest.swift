@@ -1,28 +1,33 @@
 //
-//  AssemblaRequest.swift
+//  Request.swift
 //  Assembla
 //
-//  Created by Brian Beversdorf on 11/29/20.
+//  Created by Brian Beversdorf on 9/18/21.
 //
 
 import Foundation
 import CoreData
-import UIKit
 
-struct AssemblaRequest {
-
-    static private let session: URLSession = {
+extension URLSession {
+    static let session: URLSession = {
         let config = URLSessionConfiguration.default
         config.requestCachePolicy = .reloadIgnoringLocalCacheData
         config.urlCache = nil
         return URLSession(configuration: config)
     }()
+}
 
+protocol AuthorizedRequest {
+    static func addOAuth2(request: inout URLRequest)
+    static func decode<T: Codable>(decoder: JSONDecoder, url: URL, data: Data?, response: URLResponse?, error: Error?, completion: @escaping (T?, Error?) -> Void)
+}
+
+extension AuthorizedRequest {
     static func authorizedRequest<T: Codable>(url: URL, method: String = "GET", context: NSManagedObjectContext? = nil, completion: @escaping (T?, Error?) -> Void) {
         var request = URLRequest(url: url)
         request.httpMethod = method
         Self.addOAuth2(request: &request)
-        let task = session.dataTask(with: request) { data, response, error in
+        let task = URLSession.session.dataTask(with: request) { data, response, error in
             let decoder = JSONDecoder()
             if let key = CodingUserInfoKey.managedObjectContext, let context = context {
                 decoder.userInfo[key] = context
@@ -39,43 +44,6 @@ struct AssemblaRequest {
 
         task.resume()
     }
-
-    private static func addOAuth2(request: inout URLRequest) {
-        guard let token = Auth.getAccessToken() else {
-            return
-        }
-        request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
-    }
-
-    private static func retrieveNewTokenAndRetryRequest<T: Codable>(url: URL, completion: @escaping (T?, Error?) -> Void) {
-        guard let authOperation = AuthOperation.getOAuthFromRefresh() else {
-            let error = AssemblaError(message: "missing refresh token")
-            completion(nil, error)
-            return
-        }
-        authOperation.completionBlock = {
-            Self.authorizedRequest(url: url, completion: completion)
-            authOperation.completionBlock = nil
-        }
-        RequestOperationQueue.shared.addOperation(authOperation)
-    }
-
-    private static func decode<T: Codable>(decoder: JSONDecoder, url: URL, data: Data?, response: URLResponse?, error: Error?, completion: @escaping (T?, Error?) -> Void) {
-        guard let data = data, error == nil, let decodedResponse = try? decoder.decode(T.self, from: data) else {
-            if let response = response as? HTTPURLResponse, response.statusCode == 401 {
-                retrieveNewTokenAndRetryRequest(url: url, completion: completion)
-                return
-            }
-            completion(nil, error)
-            return
-        }
-        sleep(2)
-        completion(decodedResponse, nil)
-    }
-}
-
-struct AssemblaError: Error {
-    let message: String
 }
 
 extension Formatter {

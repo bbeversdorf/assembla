@@ -10,7 +10,10 @@ import Foundation
 import CoreData
 import UIKit
 
-class Milestone: NSManagedObject, Codable {
+class Milestone: NSManagedObject, Codable, HasPrimaryKey {
+    static var primaryKeyPath: String {
+        return "id"
+    }
 
     enum CodingKeys: String, CodingKey {
         case id
@@ -35,35 +38,45 @@ class Milestone: NSManagedObject, Codable {
         try container.encode(title, forKey: .title)
     }
 
-    static func get(context: NSManagedObjectContext, spaceId: String, milestoneId: Int,  completion: ((Milestone?, Error?) -> Void)? = nil) {
+    private static func get(context: NSManagedObjectContext, spaceId: String, milestoneId: Int) -> Operation? {
         guard let url = URL(string: "https://api.assembla.com/v1/spaces/\(spaceId)/milestones/\(milestoneId).json") else {
-            return
+            return nil
         }
-        let childContext = context.newChildContext()
-        AssemblaRequest.authorizedRequest(url: url, context: childContext) { (milestone: Self?, error: Error?) in
-            guard let milestone = milestone else {
-                DispatchQueue.main.async {
-                    completion?(nil, error)
-                }
+        let operation = RequestOperation<Milestone>(url: url, context: context)
+        operation.completionBlock = {
+            defer {
+                operation.completionBlock = nil
+            }
+            let fetchRequest = NSFetchRequest<Ticket>(entityName: "Ticket")
+            fetchRequest.predicate = NSPredicate(format: "milestoneId = %i", milestoneId)
+            let milestoneFetchRequest = NSFetchRequest<Milestone>(entityName: "Milestone")
+            milestoneFetchRequest.predicate = NSPredicate(format: "id = %i", milestoneId)
+            context.performAndWait {
+                let milestone = (try? context.fetch(milestoneFetchRequest))?.first
+                let tickets = try? context.fetch(fetchRequest)
+                tickets?.forEach { $0.milestone = milestone }
+                try? context.save()
+            }
+        }
+        return operation
+    }
+
+    static func getAll(context: NSManagedObjectContext) -> [Operation] {
+        let ticketsFetchRequest = NSFetchRequest<Ticket>(entityName: "Ticket")
+        let tickets = try? context.fetch(ticketsFetchRequest)
+        let spaceStones = tickets?.reduce([Int: String]()) { (result, ticket) -> [Int: String]? in
+            var results = result
+            results?[ticket.milestoneId] = ticket.spaceId ?? "-1"
+            return results
+        }
+        var operations: [Operation] = []
+        spaceStones?.keys.forEach { spaceStoneKey in
+            let spaceStoneValue = spaceStones?[spaceStoneKey] ?? "No results"
+            guard let operation = Self.get(context: context, spaceId: spaceStoneValue, milestoneId: spaceStoneKey) else {
                 return
             }
-            let milestoneObjectId: NSManagedObjectID = {
-                let fetchRequest = NSFetchRequest<Self>(entityName: "Milestone")
-                fetchRequest.predicate = NSPredicate(format: "id = %i", milestoneId)
-                if let milestone = (try? childContext.fetch(fetchRequest).first) {
-                    milestone.update(updatedEntity: milestone)
-                    try? childContext.savePrivateContext()
-                    return milestone.objectID
-                }
-                childContext.parent?.performAndWait {
-                    childContext.parent?.insert(milestone)
-                }
-                return milestone.objectID
-            }()
-            DispatchQueue.main.async {
-                let milestone = context.object(with: milestoneObjectId) as? Self
-                completion?(milestone, error)
-            }
+            operations.append(operation)
         }
+        return operations
     }
 }

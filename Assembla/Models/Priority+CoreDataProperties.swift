@@ -12,16 +12,12 @@ import CoreData
 
 extension Priority {
 
-    @nonobjc public class func fetchRequest() -> NSFetchRequest<Priority> {
-        return NSFetchRequest<Priority>(entityName: "Priority")
-    }
-
     @NSManaged public var row: Int16
+    @NSManaged public var ticketId: Int
     @NSManaged public var section: PrioritySection?
-    @NSManaged internal var ticket: Ticket?
+    @NSManaged var tickets: [Ticket]?
 
-}
-
-extension Priority : Identifiable {
-
+    var ticket: Ticket? {
+        return tickets?.first
+    }
 }

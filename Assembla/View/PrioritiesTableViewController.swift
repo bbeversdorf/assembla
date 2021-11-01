@@ -40,6 +40,9 @@ class PrioritiesTableViewController: UITableViewController {
         ]
         if let priorities = (try? context.fetch(prioritiesFetchRequest)) {
             sectionedItems = priorities.reduce(sections, { (results, priority) -> [(title: String, items: [Priority])] in
+                guard priority.ticket != nil else {
+                    return results
+                }
                 var newResults = results
                 let sectionName = priority.section?.name ?? "Backlog"
                 guard let index = newResults.firstIndex(where: { $0.title == sectionName}) else {
@@ -98,7 +101,7 @@ class PrioritiesTableViewCell: UITableViewCell {
 
     var priority: Priority? {
         didSet {
-            guard let priority = priority, let ticket = priority.ticket else {
+            guard let priority = priority, let ticket = priority.tickets?.first else {
                 return
             }
             titleLabel?.text = "#\(ticket.numberWithPrefix!) - \(ticket.summary ?? "")"

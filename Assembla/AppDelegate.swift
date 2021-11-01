@@ -53,7 +53,37 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
          application to it. This property is optional since there are legitimate
          error conditions that could cause the creation of the store to fail.
         */
+        #if CLOUDKIT
+        let container = NSPersistentCloudKitContainer(name: "Assembla")
+
+        #if DEBUG
+        do {
+            // Use the container to initialize the development schema.
+            try container.initializeCloudKitSchema(options: [])
+        } catch {
+            // Handle any errors.
+        }
+        #endif
+        #else
         let container = NSPersistentContainer(name: "Assembla")
+        #endif
+        // Create a store description for a local store
+        let appDirectory = URL(string: NSSearchPathForDirectoriesInDomains(.applicationSupportDirectory, .userDomainMask, true)[0])
+
+        guard let description = container.persistentStoreDescriptions.first else {
+              fatalError("###\(#function): Failed to retrieve a persistent store description.")
+          }
+
+        description.setOption(true as NSNumber, forKey: NSPersistentHistoryTrackingKey)
+
+        #if CLOUDKIT
+        description.setOption(true as NSNumber, forKey: NSPersistentStoreRemoteChangeNotificationPostOptionKey)
+        // Set the container options on the cloud store
+        description.cloudKitContainerOptions =
+            NSPersistentCloudKitContainerOptions(
+                containerIdentifier: "iCloud.com.bbeversdorf.assembla.data")
+        #endif
+
         container.loadPersistentStores(completionHandler: { (storeDescription, error) in
             if let error = error as NSError? {
                 // Replace this implementation with code to handle the error appropriately.
@@ -70,6 +100,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                 // fatalError("Unresolved error \(error), \(error.userInfo)")
             }
         })
+        container.viewContext.automaticallyMergesChangesFromParent = true
         return container
     }()
 

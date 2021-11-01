@@ -11,11 +11,18 @@ import CoreData
 
 class Ticket: NSManagedObject, Codable, HasPrimaryKey {
     static var primaryKeyPath: String {
-        return "id"
+        return "ticketId"
     }
 
+    var primaryKey: String {
+        return String(describing: self[keyPath: \.ticketId])
+    }
+
+    // Transient property to delete old tickets
+    internal var deleteMe: Bool = false
+
     enum CodingKeys: String, CodingKey {
-        case id
+        case ticketId = "id"
         case number
         case totalEstimate = "total_estimate"
         case priority
@@ -53,7 +60,7 @@ class Ticket: NSManagedObject, Codable, HasPrimaryKey {
         }
         self.init(entity: entity, insertInto: nil)
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        id = try container.decode(Int.self, forKey: .id)
+        ticketId = try container.decode(Int.self, forKey: .ticketId)
         number = try container.decode(Int.self, forKey: .number)
         totalEstimate = try container.decode(Double.self, forKey: .totalEstimate)
         priority = try container.decode(Int.self, forKey: .priority)
@@ -82,7 +89,7 @@ class Ticket: NSManagedObject, Codable, HasPrimaryKey {
 
     public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encode(id, forKey: .id)
+        try container.encode(ticketId, forKey: .ticketId)
         try container.encode(number, forKey: .number)
         try container.encode(totalEstimate, forKey: .totalEstimate)
         try container.encode(priority, forKey: .priority)
@@ -107,104 +114,56 @@ class Ticket: NSManagedObject, Codable, HasPrimaryKey {
         try container.encode(statusName, forKey: .statusName)
         try container.encode(workingHours, forKey: .workingHours)
         try container.encode(numberWithPrefix, forKey: .numberWithPrefix)
-        try container.encode(space, forKey: .space)
     }
 
-    static func getTickets(context: NSManagedObjectContext, spaceId: String) -> Operation? {
-        guard let url = URL(string: "https://api.assembla.com/v1/spaces/\(spaceId)/tickets/my_active") else {
+    static func getTickets(context: NSManagedObjectContext, spaceId: String) -> RequestOperation<[Ticket]>? {
+        guard var url = URL(string: "https://api.assembla.com/v1/spaces/\(spaceId)/tickets/my_active") else {
             return nil
         }
-        return RequestOperation<Self>(url: url, context: context)
+        url.appendQueryItem(name: "per_page", value: "100")
+        return RequestOperation<[Ticket]>(url: url, context: context)
     }
 
-    static func getAll(context: NSManagedObjectContext, completion: (([Self]?, Error?) -> Void)?) {
-        let completionGroup = DispatchGroup()
-        let childContext = context.newChildContext()
-
+    static func getAll(context: NSManagedObjectContext) -> [Operation] {
         let spaceFetchRequest = NSFetchRequest<Space>(entityName: "Space")
-        let ticketFetchRequest = NSFetchRequest<Self>(entityName: "Ticket")
         var results: [Space]
         do {
             results = try context.fetch(spaceFetchRequest)
         } catch {
             results = []
         }
-        var ticketIds: [NSManagedObjectID]
-        do {
-            ticketIds = try context.fetch(ticketFetchRequest).compactMap { $0.objectID }
-        } catch {
-            ticketIds = []
-        }
-        var lastError: Error?
+        var operations: [Operation] = []
         results.forEach { space in
-            completionGroup.enter()
             let spaceId = space.id
-            let spaceObjectId = space.objectID
-            guard var url = URL(string: "https://api.assembla.com/v1/spaces/\(spaceId)/tickets/my_active") else {
-                completionGroup.leave()
+            guard let operation = getTickets(context: context, spaceId: space.id) else {
                 return
             }
-            url.appendQueryItem(name: "per_page", value: "100")
-            AssemblaRequest.authorizedRequest(url: url, context: childContext) { (tickets: [Self]?, error: Error?) in
+            let ticketsFetchRequest = NSFetchRequest<Ticket>(entityName: "Ticket")
+            ticketsFetchRequest.predicate = NSPredicate(format: "spaceId = %@", spaceId)
+            operation.completionBlock = {
                 defer {
-                    completionGroup.leave()
+                    operation.completionBlock = nil
                 }
-                guard error == nil else {
-                    lastError = lastError ?? error
+                guard operation.error == nil else {
                     return
                 }
-                tickets?.forEach { ticketResponse in
-                    let fetchRequest = NSFetchRequest<Self>(entityName: "Ticket")
-                    fetchRequest.predicate = NSPredicate(format: "id = %i", ticketResponse.id)
-                    guard let space = childContext.object(with: spaceObjectId) as? Space else {
-                        return
-                    }
-                    if let ticket = (try? childContext.fetch(fetchRequest).first) {
-                        ticket.update(updatedEntity: ticketResponse)
-                        ticket.space = space
-                        ticket.createPriority(context: childContext)
-                        if let index = ticketIds.firstIndex(of: ticket.objectID) {
-                            ticketIds.remove(at: index)
+                context.performAndWait {
+                    if let decodedObjectIds = operation.decodedObjectIds {
+                        let fetchRequest = NSFetchRequest<Ticket>(entityName: "Ticket")
+                        fetchRequest.predicate = NSPredicate(format: "spaceId = %@ AND NOT(self IN %@)", spaceId, decodedObjectIds)
+                        (try? context.fetch(fetchRequest))?.forEach {
+                            context.delete($0)
                         }
-                        return
                     }
-                    childContext.parent?.performAndWait {
-                        childContext.parent?.insert(ticketResponse)
-                        guard let parentSpace = childContext.parent?.object(with: spaceObjectId) as? Space else {
-                            return
-                        }
-                        ticketResponse.space = parentSpace
-                        ticketResponse.createPriority(context: childContext.parent!)
+                    // Load or create priority
+                    (try? context.fetch(ticketsFetchRequest))?.forEach {
+                        _ = $0.myPriority
                     }
                 }
-                do {
-                    try childContext.savePrivateContext()
-                } catch let err {
-                    print(err)
-                }
-                lastError = lastError ?? error
             }
+            operations.append(operation)
         }
-        completionGroup.notify(queue: .main) {
-            ticketIds.forEach { context.delete(context.object(with: $0)) }
-            try? context.save()
-            let fetchRequest = NSFetchRequest<Self>(entityName: "Ticket")
-            completion?(try? context.fetch(fetchRequest), lastError)
-        }
-    }
-
-    private func createPriority(context: NSManagedObjectContext) {
-        guard myPriority == nil else {
-            return
-        }
-        let fetchRequest = NSFetchRequest<PrioritySection>(entityName: "PrioritySection")
-        fetchRequest.predicate = NSPredicate(format: "id = %i", -9999)
-        guard let section = (try? context.fetch(fetchRequest))?.first else {
-            return
-        }
-        let priority = Priority(context: context)
-        priority.section = section
-        priority.ticket = self
+        return operations
     }
 }
 
@@ -218,6 +177,7 @@ extension NSManagedObjectContext {
 
     func savePrivateContext() throws {
         guard let parent = parent else {
+            try save()
             return
         }
         try save()

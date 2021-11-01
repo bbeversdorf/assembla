@@ -53,23 +53,9 @@ class Mention: NSManagedObject, HasPrimaryKey, Identifiable {
         guard let url = URL(string: "https://api.assembla.com/v1/user/mentions.json?unread") else {
             return nil
         }
-        let operation = RequestOperation<[Self]>(url: url, context: context)
-        operation.completionBlock = {
-            operation.completionBlock = nil
-        }
-        return operation
+        return RequestOperation<[Self]>(url: url, context: context)
     }
 
-    static func getAll(completion: @escaping ([Self]?, Error?) -> Void) {
-        guard let url = URL(string: "https://api.assembla.com/v1/user/mentions.json?unread") else {
-            return
-        }
-        AssemblaRequest.authorizedRequest(url: url) { (mentions: [Self]?, error: Error?) in
-            let unread = mentions?.filter { $0.read == false }
-
-            completion(unread, error)
-        }
-    }
 
     func markAsRead() {
         defer {

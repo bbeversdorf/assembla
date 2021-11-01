@@ -51,7 +51,7 @@ struct TicketsListView_Previews: PreviewProvider {
     static var previews: some View {
         let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
         let ticket = Ticket(context: context)
-        ticket.id = 123
+        ticket.ticketId = 123
         ticket.number = 123
         ticket.totalEstimate = 123
         ticket.priority = 1

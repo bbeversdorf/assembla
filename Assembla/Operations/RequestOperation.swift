@@ -21,11 +21,14 @@ class RequestOperation<T: Upsertable>: AsynchronousOperation {
 
     let url: URL
     let context: NSManagedObjectContext?
+    let parse: Bool
     let method: String = "GET"
+    var decodedObjectIds: T.ObjectID?
 
-    required init(url: URL, context: NSManagedObjectContext? = nil) {
+    required init(url: URL, context: NSManagedObjectContext? = nil, parse: Bool = true) {
         self.url = url
         self.context = context
+        self.parse = parse
     }
 
     override func main() {
@@ -43,9 +46,19 @@ class RequestOperation<T: Upsertable>: AsynchronousOperation {
                 self.completeOperation(error: error)
                 return
             }
-            let parseOperation = ParseOperation<T>(context: context, data: data)
-            ParseOperationQueue.shared.addOperation(parseOperation)
-            self.completeOperation()
+            if self.parse {
+                let parseOperation = ParseOperation<T>(context: context, data: data)
+                parseOperation.completionBlock = {
+                    defer {
+                        parseOperation.completionBlock = nil
+                    }
+                    self.decodedObjectIds = parseOperation.decodedObjectIds
+                    self.completeOperation()
+                }
+                ParseOperationQueue.shared.addOperation(parseOperation)
+            } else {
+                self.completeOperation()
+            }
         }
 
         task.resume()

@@ -55,7 +55,7 @@ struct TicketSectionView_Previews: PreviewProvider {
         milestone.title = "Test"
         milestone.id = -1
         let ticket = Ticket(context: context)
-        ticket.id = 123
+        ticket.ticketId = 123
         ticket.number = 123
         ticket.totalEstimate = 123
         ticket.priority = 1
@@ -87,43 +87,29 @@ struct TicketSectionView_Previews: PreviewProvider {
 
 class TicketsModel {
     func fetch(context: NSManagedObjectContext) {
-        _ = Space.getAll(context: context) { spaces, _ in
-            self.getTickets(context: context)
+        guard let spaceOperation = Space.get(context: context) else {
+            return
         }
-
-    }
-
-    private func getTickets(context: NSManagedObjectContext) {
-        _ = Ticket.getAll(context: context) { tickets, error in
-            guard error == nil else {
-                print(error ?? "No error")
-                return
-            }
-            let spaceStones = tickets?.reduce([Int: String]()) { (result, ticket) -> [Int: String]? in
-                var results = result
-                results?[ticket.milestoneId] = ticket.spaceId ?? "-1"
-                return results
-            }
-            spaceStones?.keys.forEach { spaceStoneKey in
-                let spaceStoneValue = spaceStones?[spaceStoneKey] ?? "No results"
-                Milestone.get(context: context, spaceId: spaceStoneValue, milestoneId: spaceStoneKey) { milestone, error in
-                    guard error == nil else {
-                        print(error ?? "No error")
-                        return
-                    }
-                    let fetchRequest = NSFetchRequest<Ticket>(entityName: "Ticket")
-                    fetchRequest.predicate = NSPredicate(format: "milestoneId = %i", milestone?.id ?? 0)
-                    let tickets = try? context.fetch(fetchRequest)
-                    tickets?.forEach { $0.milestone = milestone }
-                    try? context.save()
+        let milestoneOperation = BlockOperation {
+            context.perform {
+                let milestoneOperations = Milestone.getAll(context: context)
+                milestoneOperations.forEach {
+                    RequestOperationQueue.shared.addOperation($0)
                 }
             }
         }
-    }
-
-    private func getSpaceTools(context: NSManagedObjectContext, spaces: [Space]?) {
-        spaces?.forEach { space in
-            SpaceTool.getAll(context: context, spaceId: space.id)
+        let ticketOperation = BlockOperation {
+            context.perform {
+                let ticketOperations = Ticket.getAll(context: context)
+                ticketOperations.forEach {
+                    RequestOperationQueue.shared.addOperation($0)
+                }
+                ticketOperations.forEach { milestoneOperation.addDependency($0) }
+                RequestOperationQueue.shared.addOperation(milestoneOperation)
+            }
         }
+        ticketOperation.addDependency(spaceOperation)
+        RequestOperationQueue.shared.addOperation(spaceOperation)
+        RequestOperationQueue.shared.addOperation(ticketOperation)
     }
 }

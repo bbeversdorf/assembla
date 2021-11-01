@@ -14,6 +14,7 @@ class ParseOperation<T: Upsertable>: Operation {
     let childContext: NSManagedObjectContext
     let data: Data
     var error: Error?
+    var decodedObjectIds: T.ObjectID?
 
     init(context: NSManagedObjectContext, data: Data) {
         self.context = context
@@ -24,13 +25,14 @@ class ParseOperation<T: Upsertable>: Operation {
     override func main() {
         let decoder = JSONDecoder()
         decoder.dateDecodingStrategy = .formatted(DateFormatter.iso8601)
-        childContext.perform {
+        childContext.performAndWait {
             if let key = CodingUserInfoKey.managedObjectContext {
                 decoder.userInfo[key] = self.childContext
             }
             do {
                 let decoded = try self.decode(decoder: decoder, data: self.data)
-                decoded?.upsert(childContext: self.childContext)
+                self.decodedObjectIds = decoded?.upsert(childContext: self.childContext)
+                try self.childContext.savePrivateContext()
             } catch let error {
                 self.error = error
             }
@@ -45,38 +47,43 @@ class ParseOperation<T: Upsertable>: Operation {
     }
 }
 
-protocol HasPrimaryKey: Upsertable, NSManagedObject, Identifiable {
+protocol HasPrimaryKey: Upsertable, NSManagedObject, Identifiable where ObjectID == NSManagedObjectID {
+    static var primaryKeyPath: String { get }
     var primaryKey: String { get }
 }
 
 extension HasPrimaryKey {
+
     var primaryKey: String {
         return String(describing: self[keyPath: \.id])
     }
 
-    func upsert(childContext: NSManagedObjectContext) {
+    func upsert(childContext: NSManagedObjectContext) -> NSManagedObjectID {
         let decoded = self
         let fetchRequest = NSFetchRequest<Self>(entityName: String(describing: Self.self))
-        fetchRequest.predicate = NSPredicate(format: "%K == %@", "id", decoded.primaryKey)
+        fetchRequest.predicate = NSPredicate(format: "%K == %@", Self.primaryKeyPath, decoded.primaryKey)
         if let object = (try? childContext.fetch(fetchRequest).first) {
             object.update(updatedEntity: decoded)
             try? childContext.savePrivateContext()
-            return
+            return object.objectID
         }
         childContext.parent?.performAndWait {
             childContext.parent?.insert(decoded)
         }
+        return decoded.objectID
     }
 
 }
 
 protocol Upsertable: Codable {
-    func upsert(childContext: NSManagedObjectContext)
+    func upsert(childContext: NSManagedObjectContext) -> ObjectID
+    associatedtype ObjectID
 }
 
 extension Array: Upsertable where Element: HasPrimaryKey {
-    func upsert(childContext: NSManagedObjectContext) {
-        self.forEach { element in
+    typealias ObjectID = [NSManagedObjectID]
+    func upsert(childContext: NSManagedObjectContext) -> [NSManagedObjectID] {
+        self.map { element in
             element.upsert(childContext: childContext)
         }
     }

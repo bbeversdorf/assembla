@@ -9,7 +9,10 @@ import Foundation
 import CoreData
 import UIKit
 
-class Space: NSManagedObject, Codable {
+class Space: NSManagedObject, HasPrimaryKey {
+    static var primaryKeyPath: String {
+        return "id"
+    }
 
     enum CodingKeys: String, CodingKey {
         case id
@@ -118,29 +121,11 @@ class Space: NSManagedObject, Codable {
         try container.encode(bannerLink, forKey: .bannerLink)
     }
 
-    static func getAll(context: NSManagedObjectContext, completion: @escaping ([Self]?, Error?) -> Void) {
+    static func get(context: NSManagedObjectContext) -> Operation? {
         guard let url = URL(string: "https://api.assembla.com/v1/spaces.json") else {
-            return
+            return nil
         }
-        let childContext = context.newChildContext()
-        AssemblaRequest.authorizedRequest(url: url, context: childContext) { (spaces: [Self]?, error: Error?) in
-            spaces?.forEach { spaceResponse in
-                let fetchRequest = NSFetchRequest<Self>(entityName: "Space")
-                fetchRequest.predicate = NSPredicate(format: "id = %@", spaceResponse.id)
-                if let space = (try? childContext.fetch(fetchRequest).first) {
-                    space.update(updatedEntity: spaceResponse)
-                    try? childContext.savePrivateContext()
-                    return
-                }
-                childContext.parent?.performAndWait {
-                    childContext.parent?.insert(spaceResponse)
-                }
-            }
-            DispatchQueue.main.async {
-                let fetchRequest = NSFetchRequest<Self>(entityName: "Space")
-                completion(try? context.fetch(fetchRequest), error)
-            }
-        }
+        return RequestOperation<[Self]>(url: url, context: context)
     }
 }
 
@@ -159,4 +144,25 @@ extension NSManagedObject {
             self.setValue(value, forKey: key)
         }
     }
+}
+
+public struct NSExceptionError: Swift.Error {
+
+   public let exception: NSException
+
+   public init(exception: NSException) {
+      self.exception = exception
+   }
+}
+
+public struct ObjC {
+
+   public static func perform(workItem: () -> Void) throws {
+      let exception = ExecuteWithObjCExceptionHandling {
+         workItem()
+      }
+      if let exception = exception {
+         throw NSExceptionError(exception: exception)
+      }
+   }
 }

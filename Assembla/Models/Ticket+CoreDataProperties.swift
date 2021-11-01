@@ -16,7 +16,19 @@ extension Ticket {
         return NSFetchRequest<Ticket>(entityName: "Ticket")
     }
 
-    @NSManaged public var id: Int
+    internal var space: Space? {
+        return spaces?.first
+    }
+
+    internal var myPriority: Priority {
+        guard let priority = priorities?.first else {
+            let newPriority = Priority.createPriority(context: managedObjectContext!, ticketId: ticketId)
+            return newPriority
+        }
+        return priority
+    }
+
+    @NSManaged public var ticketId: Int
     @NSManaged public var number: Int
     @NSManaged public var totalEstimate: Double
     @NSManaged public var priority: Int
@@ -41,9 +53,9 @@ extension Ticket {
     @NSManaged public var statusName: Int
     @NSManaged public var workingHours: Double
     @NSManaged public var numberWithPrefix: String?
-    @NSManaged internal var space: Space?
     @NSManaged internal var milestone: Milestone?
-    @NSManaged internal var myPriority: Priority?
+    @NSManaged internal var priorities: [Priority]?
+    @NSManaged internal var spaces: [Space]?
 }
 
 extension Ticket : Identifiable {

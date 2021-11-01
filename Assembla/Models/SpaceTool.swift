@@ -9,7 +9,10 @@
 import Foundation
 import CoreData
 
-class SpaceTool: NSManagedObject, Codable {
+class SpaceTool: NSManagedObject, HasPrimaryKey {
+    static var primaryKeyPath: String {
+        return "id"
+    }
     enum CodingKeys: String, CodingKey {
         case id
         case name
@@ -44,35 +47,29 @@ class SpaceTool: NSManagedObject, Codable {
         try container.encode(space, forKey: .space)
     }
 
-    static func getAll(context: NSManagedObjectContext, spaceId: String, completion: (([SpaceTool]?, Error?) -> Void)? = nil) {
+    static func get(context: NSManagedObjectContext, spaceId: String) -> Operation? {
         guard let url = URL(string: "https://api.assembla.com/v1/spaces/\(spaceId)/space_tools/repo.json") else {
-            return
+            return nil
         }
+        let operation = RequestOperation<Self>(url: url, context: context)
         let childContext = context.newChildContext()
-        AssemblaRequest.authorizedRequest(url: url, context: childContext) { (spaceTools: [Self]?, error: Error?) in
-            let mappedSpaces = spaceTools?.compactMap { spaceTool -> NSManagedObjectID in
-                let fetchRequest = NSFetchRequest<Self>(entityName: "SpaceTool")
-                fetchRequest.predicate = NSPredicate(format: "id = %@", spaceTool.id)
-                let spaceFetchRequest = NSFetchRequest<Space>(entityName: "Space")
-                spaceFetchRequest.predicate = NSPredicate(format: "id = %@", spaceId)
-                let space = try? childContext.fetch(spaceFetchRequest).first
-                if let tool = (try? childContext.fetch(fetchRequest).first) {
-                    tool.update(updatedEntity: spaceTool)
-                    tool.space = space
-                    try? childContext.savePrivateContext()
-                    return tool.objectID
-                }
-                childContext.parent?.performAndWait {
-                    childContext.parent?.insert(spaceTool)
-                }
-                spaceTool.space = space
-                return spaceTool.objectID
-            } ?? []
-            DispatchQueue.main.async {
-                let fetchRequest = NSFetchRequest<Self>(entityName: "SpaceTool")
-                fetchRequest.predicate = NSPredicate(format: "self = %@", mappedSpaces)
-                completion?(try? context.fetch(fetchRequest), error)
+        operation.completionBlock = {
+            defer {
+                operation.completionBlock = nil
+            }
+            let fetchRequest = NSFetchRequest<Self>(entityName: "SpaceTool")
+            fetchRequest.predicate = NSPredicate(format: "space = nil")
+            let spaceFetchRequest = NSFetchRequest<Space>(entityName: "Space")
+            spaceFetchRequest.predicate = NSPredicate(format: "id = %@", spaceId)
+            guard let space = try? childContext.fetch(spaceFetchRequest).first,
+                  let tools = (try? childContext.fetch(fetchRequest)),
+                  tools.isEmpty == false else {
+                return
+            }
+            tools.forEach { tool in
+                tool.space = space
             }
         }
+        return operation
     }
 }

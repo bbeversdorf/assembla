@@ -32,6 +32,9 @@
 		1499A22E2575B09100482485 /* Space+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1499A22C2575B09100482485 /* Space+CoreDataProperties.swift */; };
 		1499A2362576182B00482485 /* Ticket.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1499A2342576182B00482485 /* Ticket.swift */; };
 		1499A2372576182B00482485 /* Ticket+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1499A2352576182B00482485 /* Ticket+CoreDataProperties.swift */; };
+		14C0B60726F6CB8300E05306 /* AuthorizedRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14C0B60626F6CB8300E05306 /* AuthorizedRequest.swift */; };
+		14C0B60926F6CE8900E05306 /* WorkamajigAuth.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14C0B60826F6CE8900E05306 /* WorkamajigAuth.swift */; };
+		14C0B60B26F6DD7800E05306 /* WorkamajigOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14C0B60A26F6DD7800E05306 /* WorkamajigOperation.swift */; };
 		14C789A025B52EEE009DFAC8 /* AuthOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14C7899F25B52EEE009DFAC8 /* AuthOperation.swift */; };
 		14CBE2D42687A8AB006A7A0C /* PrioritiesListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14CBE2D32687A8AB006A7A0C /* PrioritiesListView.swift */; };
 		14CBE2D92687B412006A7A0C /* SwiftReorder in Frameworks */ = {isa = PBXBuildFile; productRef = 14CBE2D82687B412006A7A0C /* SwiftReorder */; };
@@ -59,9 +62,12 @@
 		140176E525834585002013B0 /* MergeRequest+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MergeRequest+CoreDataProperties.swift"; sourceTree = "<group>"; };
 		140176E625834585002013B0 /* MergeRequestComment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MergeRequestComment.swift; sourceTree = "<group>"; };
 		140176E725834585002013B0 /* MergeRequestComment+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MergeRequestComment+CoreDataProperties.swift"; sourceTree = "<group>"; };
+		141BDE472692094B00D2D94D /* CloudKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CloudKit.framework; path = System/Library/Frameworks/CloudKit.framework; sourceTree = SDKROOT; };
 		143BC18125C8A37C00917CFE /* Mention+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Mention+CoreDataProperties.swift"; sourceTree = "<group>"; };
 		14634F0626837A07000E36A0 /* MentionsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MentionsView.swift; sourceTree = "<group>"; };
 		14634F0926837C52000E36A0 /* TicketsListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TicketsListView.swift; sourceTree = "<group>"; };
+		1463F0FE26FA6B92006A68F9 /* ExcpetionHandler.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ExcpetionHandler.h; sourceTree = "<group>"; };
+		1463F10026FA6C80006A68F9 /* Assembla-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Assembla-Bridging-Header.h"; sourceTree = "<group>"; };
 		1466128C256B7D4000E4EE7D /* Assembla.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Assembla.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		1466128F256B7D4000E4EE7D /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		14661291256B7D4000E4EE7D /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -80,6 +86,9 @@
 		1499A22C2575B09100482485 /* Space+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Space+CoreDataProperties.swift"; sourceTree = "<group>"; };
 		1499A2342576182B00482485 /* Ticket.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Ticket.swift; sourceTree = "<group>"; };
 		1499A2352576182B00482485 /* Ticket+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Ticket+CoreDataProperties.swift"; sourceTree = "<group>"; };
+		14C0B60626F6CB8300E05306 /* AuthorizedRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthorizedRequest.swift; sourceTree = "<group>"; };
+		14C0B60826F6CE8900E05306 /* WorkamajigAuth.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkamajigAuth.swift; sourceTree = "<group>"; };
+		14C0B60A26F6DD7800E05306 /* WorkamajigOperation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkamajigOperation.swift; sourceTree = "<group>"; };
 		14C7899F25B52EEE009DFAC8 /* AuthOperation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthOperation.swift; sourceTree = "<group>"; };
 		14CBE2D32687A8AB006A7A0C /* PrioritiesListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrioritiesListView.swift; sourceTree = "<group>"; };
 		14CBE2DB2687B6DF006A7A0C /* Priorities.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = Priorities.storyboard; sourceTree = "<group>"; };
@@ -136,13 +145,15 @@
 				146612A7256B7D4500E4EE7D /* Assembla.entitlements */,
 				1466128F256B7D4000E4EE7D /* AppDelegate.swift */,
 				14661291256B7D4000E4EE7D /* SceneDelegate.swift */,
-				14A6DA7A2571F63900859C13 /* AssemblaRequest */,
+				14A6DA7A2571F63900859C13 /* Request */,
 				14DBFDF225B3F9F700787C98 /* Operations */,
 				14981A5A2574BDB3005D2078 /* Models */,
 				146612AE256B7ECB00E4EE7D /* View */,
 				14661298256B7D4100E4EE7D /* Assets.xcassets */,
 				146612A0256B7D4100E4EE7D /* Info.plist */,
 				1466129A256B7D4100E4EE7D /* Preview Content */,
+				1463F0FE26FA6B92006A68F9 /* ExcpetionHandler.h */,
+				1463F10026FA6C80006A68F9 /* Assembla-Bridging-Header.h */,
 			);
 			path = Assembla;
 			sourceTree = "<group>";
@@ -178,6 +189,7 @@
 			children = (
 				14661295256B7D4000E4EE7D /* Assembla.xcdatamodeld */,
 				14981A602574BE20005D2078 /* Auth.swift */,
+				14C0B60826F6CE8900E05306 /* WorkamajigAuth.swift */,
 				14981A5D2574BDF1005D2078 /* Mention.swift */,
 				143BC18125C8A37C00917CFE /* Mention+CoreDataProperties.swift */,
 				1499A2342576182B00482485 /* Ticket.swift */,
@@ -200,12 +212,13 @@
 			path = Models;
 			sourceTree = "<group>";
 		};
-		14A6DA7A2571F63900859C13 /* AssemblaRequest */ = {
+		14A6DA7A2571F63900859C13 /* Request */ = {
 			isa = PBXGroup;
 			children = (
+				14C0B60626F6CB8300E05306 /* AuthorizedRequest.swift */,
 				14981A5625749785005D2078 /* AssemblaRequest.swift */,
 			);
-			path = AssemblaRequest;
+			path = Request;
 			sourceTree = "<group>";
 		};
 		14DBFDF225B3F9F700787C98 /* Operations */ = {
@@ -214,6 +227,7 @@
 				14DBFDFB25B3FCE500787C98 /* OperationQueue */,
 				14C7899F25B52EEE009DFAC8 /* AuthOperation.swift */,
 				14DBFDFC25B3FD0000787C98 /* RequestOperation.swift */,
+				14C0B60A26F6DD7800E05306 /* WorkamajigOperation.swift */,
 				14DBFDFF25B3FD1C00787C98 /* ParseOperation.swift */,
 			);
 			path = Operations;
@@ -231,6 +245,7 @@
 		14F53CDD257F528600099EA0 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				141BDE472692094B00D2D94D /* CloudKit.framework */,
 				14F53CDE257F528600099EA0 /* SwiftUI.framework */,
 			);
 			name = Frameworks;
@@ -316,9 +331,11 @@
 			buildActionMask = 2147483647;
 			files = (
 				140176E925834585002013B0 /* MergeRequest+CoreDataProperties.swift in Sources */,
+				14C0B60726F6CB8300E05306 /* AuthorizedRequest.swift in Sources */,
 				14DBFDF825B3FA2400787C98 /* ParseOperationQueue.swift in Sources */,
 				14661290256B7D4000E4EE7D /* AppDelegate.swift in Sources */,
 				14634F0726837A07000E36A0 /* MentionsView.swift in Sources */,
+				14C0B60926F6CE8900E05306 /* WorkamajigAuth.swift in Sources */,
 				14DBFDFD25B3FD0000787C98 /* RequestOperation.swift in Sources */,
 				140176E025832F95002013B0 /* SpaceTool.swift in Sources */,
 				14981A6A2574E58E005D2078 /* Space.swift in Sources */,
@@ -332,6 +349,7 @@
 				1499A2372576182B00482485 /* Ticket+CoreDataProperties.swift in Sources */,
 				14F53CDB257F508400099EA0 /* TicketRowView.swift in Sources */,
 				14661297256B7D4000E4EE7D /* Assembla.xcdatamodeld in Sources */,
+				14C0B60B26F6DD7800E05306 /* WorkamajigOperation.swift in Sources */,
 				14F53D16257F631200099EA0 /* Milestone.swift in Sources */,
 				14F53D17257F631200099EA0 /* Milestone+CoreDataProperties.swift in Sources */,
 				14CBE2E526898167006A7A0C /* Priority.swift in Sources */,
@@ -491,9 +509,12 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = Assembla/Assembla.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_ASSET_PATHS = "\"Assembla/Preview Content\"";
 				DEVELOPMENT_TEAM = CU36JKATZP;
+				"ENABLE_HARDENED_RUNTIME[sdk=macosx*]" = YES;
 				ENABLE_PREVIEWS = YES;
 				INFOPLIST_FILE = Assembla/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 14.2;
@@ -501,10 +522,13 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.bbeversdorf.assembla;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.bbeversdorf.my-assembla";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=macosx*]" = "";
 				SUPPORTS_MACCATALYST = YES;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SWIFT_OBJC_BRIDGING_HEADER = "Assembla/Assembla-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2,6";
 			};
@@ -516,9 +540,12 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = Assembla/Assembla.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_ASSET_PATHS = "\"Assembla/Preview Content\"";
 				DEVELOPMENT_TEAM = CU36JKATZP;
+				"ENABLE_HARDENED_RUNTIME[sdk=macosx*]" = YES;
 				ENABLE_PREVIEWS = YES;
 				INFOPLIST_FILE = Assembla/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 14.2;
@@ -526,10 +553,13 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.bbeversdorf.assembla;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.bbeversdorf.my-assembla";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=macosx*]" = "";
 				SUPPORTS_MACCATALYST = YES;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SWIFT_OBJC_BRIDGING_HEADER = "Assembla/Assembla-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2,6";
 			};

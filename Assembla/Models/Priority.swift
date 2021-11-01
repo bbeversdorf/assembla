@@ -9,7 +9,29 @@
 import UIKit
 import CoreData
 
-public class Priority: NSManagedObject {
+class Priority: NSManagedObject, Identifiable {
+    static var primaryKeyPath: String {
+        return "id"
+    }
+
+    static func createPriority(context: NSManagedObjectContext, ticketId: Int) -> Priority {
+        let priorityFetchRequest = NSFetchRequest<Priority>(entityName: "Priority")
+        priorityFetchRequest.predicate = NSPredicate(format: "ticketId = %i", ticketId)
+        let oldPriority = (try? context.fetch(priorityFetchRequest))?.first
+        guard oldPriority == nil else {
+            return oldPriority!
+        }
+        let priority = Priority(context: context)
+        priority.ticketId = ticketId
+
+        let fetchRequest = NSFetchRequest<PrioritySection>(entityName: "PrioritySection")
+        fetchRequest.predicate = NSPredicate(format: "id = %i", -9999)
+        guard let section = (try? context.fetch(fetchRequest))?.first else {
+            return priority
+        }
+        priority.section = section
+        return priority
+    }
 
     var color: UIColor? {
         guard let ticket = ticket else {

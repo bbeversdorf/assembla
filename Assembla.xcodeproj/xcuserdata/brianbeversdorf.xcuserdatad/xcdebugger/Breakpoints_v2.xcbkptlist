@@ -19,10 +19,34 @@
             uuid = "FFB3BA15-0BA4-4C4A-9285-169186B31372"
             shouldBeEnabled = "Yes"
             ignoreCount = "0"
-            continueAfterRunningActions = "No"
+            continueAfterRunningActions = "Yes"
             breakpointStackSelectionBehavior = "1"
             scope = "1"
             stopOnStyle = "0">
+            <Actions>
+               <BreakpointActionProxy
+                  ActionExtensionID = "Xcode.BreakpointAction.DebuggerCommand">
+                  <ActionContent
+                     consoleCommand = "po $arg1">
+                  </ActionContent>
+               </BreakpointActionProxy>
+            </Actions>
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "097097C9-20DA-403E-98E5-1D98E1BA4AF0"
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "Assembla/Models/Ticket+CoreDataProperties.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "25"
+            endingLineNumber = "25"
+            landmarkName = "myPriority"
+            landmarkType = "24">
          </BreakpointContent>
       </BreakpointProxy>
    </Breakpoints>
